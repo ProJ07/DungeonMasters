@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 
 public class UserData : MonoBehaviour
 {
-    public int coins = 100;
+    public int coins = 20;
     public int gems = 5;
     public int damageLevel = 0;
     public int healthLevel = 0;
@@ -50,7 +50,6 @@ public class UserData : MonoBehaviour
 
     private void Start()
     {
-
         SetTexts();
 
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
@@ -81,6 +80,7 @@ public class UserData : MonoBehaviour
     {
         coinsText.text = coins.ToString();
         gemsText.text = gems.ToString();
+
         if (menuUpgradeActive)
         {
             damageLevelText.text = damageLevel.ToString();
@@ -121,14 +121,14 @@ public class UserData : MonoBehaviour
 
     public void LoadUserData()
     {
-        
+
         if (user != null)
         {
             DocumentReference docRef = db.Collection("users").Document(user.UserId).Collection("data").Document("userData");
 
             docRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
             {
-                
+
                 if (task.IsFaulted)
                 {
                     Debug.LogError("Error loading user data: " + task.Exception);
@@ -155,6 +155,11 @@ public class UserData : MonoBehaviour
                 }
             });
         }
+    }
+
+    public void SetUpgradeMenuVar(bool var)
+    {
+        menuUpgradeActive = var;
     }
 
     public void SetUpgradeMenuTexts()

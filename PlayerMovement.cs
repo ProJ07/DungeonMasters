@@ -21,60 +21,21 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (SceneManager.GetActiveScene().name == "Village")
-        {
-            inGame = false;
-            //menus = new List<GameObject>
-            //{
-            //    GameObject.Find("MenuAccountLogin"),
-            //    GameObject.Find("MenuAccountRegister"),
-            //    GameObject.Find("MenuAccountInfo"),
-            //    GameObject.Find("MenuUpgrade"),
-            //    GameObject.Find("MenuAccountLogin")
-            //};
-        }
-        else
-        {
-            inGame = true;
-        }
+        if (!enabled) return;
 
-        bool isAnyMenuActive = false;
+        // Si no hay menús activos, permitir movimiento
+        float moveX = Input.GetAxisRaw("Horizontal");
+        float moveY = Input.GetAxisRaw("Vertical");
+        moveInput = new Vector2(moveX, moveY).normalized;
 
-        if (!inGame)
-        {
-            foreach (GameObject menu in menus)
-            {
-                if (menu.activeSelf)
-                {
-                    isAnyMenuActive = true;
-                    break;
-                }
-            }
-        }
-
-        if (isAnyMenuActive)
-        {
-            // Si algún menú está activo, no permitir movimiento
-            moveInput = Vector2.zero;
-            playerAnimator.SetFloat("Horizontal", 0);
-            playerAnimator.SetFloat("Vertical", 0);
-            playerAnimator.SetFloat("Speed", 0);
-        }
-        else
-        {
-            // Si no hay menús activos, permitir movimiento
-            float moveX = Input.GetAxisRaw("Horizontal");
-            float moveY = Input.GetAxisRaw("Vertical");
-            moveInput = new Vector2(moveX, moveY).normalized;
-
-            playerAnimator.SetFloat("Horizontal", moveX);
-            playerAnimator.SetFloat("Vertical", moveY);
-            playerAnimator.SetFloat("Speed", moveInput.sqrMagnitude);
-        }
+        playerAnimator.SetFloat("Horizontal", moveX);
+        playerAnimator.SetFloat("Vertical", moveY);
+        playerAnimator.SetFloat("Speed", moveInput.sqrMagnitude);
     }
 
     private void FixedUpdate()
     {
+        if (!enabled) return;
         playerRB.MovePosition(playerRB.position + moveInput * PlayerStats.Instance.speed * Time.fixedDeltaTime);
     }
 

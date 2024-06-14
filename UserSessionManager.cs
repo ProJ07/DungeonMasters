@@ -99,7 +99,19 @@ public class UserSessionManager : MonoBehaviour
     {
         auth.SignOut();
         user = null;
+        SetValuesToDefault();
         Debug.Log("User logged out successfully.");
         ShowLoginMenu();
+    }
+
+    public void SetValuesToDefault()
+    {
+        UserData.Instance.coins = 20;
+        UserData.Instance.gems = 5;
+        UserData.Instance.damageLevel = 0;
+        UserData.Instance.healthLevel = 0;
+        UserData.Instance.speedLevel = 0;
+        UserData.Instance.mediumUnlocked = false;
+        UserData.Instance.hardUnlocked = false;
     }
 }

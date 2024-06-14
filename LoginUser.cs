@@ -89,6 +89,7 @@ public class LoginUser : MonoBehaviour
                         }
 
                         UserSessionManager.Instance.user = authTask.Result.User;
+                        UserData.Instance.LoadUserData();
                         StartCoroutine(UpdateFeedbackUI("User logged in successfully!"));
                     });
                     return;

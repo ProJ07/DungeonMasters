@@ -39,6 +39,9 @@ public class SceneLoader : MonoBehaviour
         Debug.Log("Loading Village.");
         PlayerStats.Instance.ResetPlayer();
         UserData.Instance.SetTexts();
+        Destroy(GameObject.Find("GameStats"));
+        
+        Destroy(GameObject.Find("RoundManager"));
         UserData.Instance.LoadUserData();
     }
 

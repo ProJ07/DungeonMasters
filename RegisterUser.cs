@@ -98,6 +98,8 @@ public class RegisterUser : MonoBehaviour
                     StartCoroutine(UpdateFeedbackUI("Error storing user data"));
                     return;
                 }
+                UserSessionManager.Instance.user = newUser;
+                UserData.Instance.LoadUserData();
                 StartCoroutine(UpdateFeedbackUI("User registered successfully!"));
             });
         });

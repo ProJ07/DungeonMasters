@@ -7,20 +7,27 @@ public class TriggerInteraction : MonoBehaviour
     
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (menu.activeSelf)
+        if (buttonUI != null)
         {
-            buttonUI.SetActive(false);
-        } else if (other.CompareTag("Player"))  // Asegúrate de que el jugador tiene el tag "Player"
-        {
-            buttonUI.SetActive(true);  // Activa el botón cuando el jugador entra en el trigger
+            if (menu.activeSelf)
+            {
+                buttonUI.SetActive(false);
+            }
+            else if (other.CompareTag("Player"))  // Asegúrate de que el jugador tiene el tag "Player"
+            {
+                buttonUI.SetActive(true);  // Activa el botón cuando el jugador entra en el trigger
+            }
         }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (buttonUI != null)
         {
-            buttonUI.SetActive(false);  // Desactiva el botón cuando el jugador sale del trigger
+            if (other.CompareTag("Player"))
+            {
+                buttonUI.SetActive(false);  // Desactiva el botón cuando el jugador sale del trigger
+            }
         }
     }
 }

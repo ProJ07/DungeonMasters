@@ -43,6 +43,16 @@ public class GameData : MonoBehaviour
     // Increment the round and update the round multiplier
     public void NextRound()
     {
+        if (currentRound > 20 && difficultyMultiplier == 1f)
+        {
+            UserData.Instance.mediumUnlocked = true;
+        }
+
+        if (currentRound > 20 && difficultyMultiplier == 1.5f)
+        {
+            UserData.Instance.hardUnlocked = true;
+        }
+
         currentRound++;
         if (currentRound > 1)
         {

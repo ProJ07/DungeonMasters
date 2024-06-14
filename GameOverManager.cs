@@ -29,6 +29,7 @@ public class GameOverManager : MonoBehaviour
     {
         Time.timeScale = 1f; // Reanudar el juego
         UserData.Instance.SaveUserData();
+        Destroy(GameObject.Find("AuthManager"));
         SceneManager.LoadScene("Village");
     }
 }
