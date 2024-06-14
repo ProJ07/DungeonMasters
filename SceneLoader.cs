@@ -1,0 +1,57 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+public class SceneLoader : MonoBehaviour
+{
+    private void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    private void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    // Esta función se llama cada vez que se carga una nueva escena
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.Log("Escena cargada: " + scene.name);
+
+        // Verificar el nombre de la escena
+        switch (scene.name)
+        {
+            case "Village":
+                HandleVillageScene();
+                break;
+            case "Game":
+                HandleGameScene();
+                break;
+            default:
+                HandleDefaultScene();
+                break;
+        }
+    }
+
+    // Define aquí las funciones que deseas ejecutar para cada escena
+    private void HandleVillageScene()
+    {
+        Debug.Log("Loading Village.");
+        PlayerStats.Instance.ResetPlayer();
+        UserData.Instance.SetTexts();
+        UserData.Instance.LoadUserData();
+    }
+
+    private void HandleGameScene()
+    {
+        Debug.Log("Loading Game.");
+        // Lógica específica para la escena Game
+        // Por ejemplo, iniciar el juego, configurar enemigos, etc.
+    }
+
+    private void HandleDefaultScene()
+    {
+        Debug.Log("Ejecutando lógica para la escena por defecto.");
+        // Lógica para cualquier otra escena
+    }
+}
