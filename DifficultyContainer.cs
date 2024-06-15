@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DifficultyContainer : MonoBehaviour
 {
+    public Button easyButton;
+
     public Button mediumButton;
     public Image mediumLockImage;
 
@@ -19,6 +19,10 @@ public class DifficultyContainer : MonoBehaviour
     void Start()
     {
         ButtonCheck();
+        easyButton.onClick.AddListener(OnEasyButtonClick);
+        mediumButton.onClick.AddListener(OnMediumButtonClick);
+        hardButton.onClick.AddListener(OnHardButtonClick);
+        
     }
 
     void ButtonCheck()
@@ -49,4 +53,20 @@ public class DifficultyContainer : MonoBehaviour
             hardButton.interactable = true;
         }
     }
+
+    void OnEasyButtonClick()
+    {
+        GameData.Instance.SetDifficultyMultiplierAndLoadGame(1f);
+    }
+
+    void OnMediumButtonClick()
+    {
+        GameData.Instance.SetDifficultyMultiplierAndLoadGame(1.5f);
+    }
+
+    void OnHardButtonClick()
+    {
+        GameData.Instance.SetDifficultyMultiplierAndLoadGame(2f);
+    }
+
 }

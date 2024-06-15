@@ -9,11 +9,12 @@ public class UpgradeContainer : MonoBehaviour
 
     public GameObject itemPrefab; // Prefab 
     public RectTransform container; // RectTransform del contenedor
+    public TMP_Text levelText; // Nivel de mejora
     public TMP_Text maxLevelText; // Nivel máximo
     public TMP_Text costText; // Costo de mejora
     public int menuNumber; // Número de menu
 
-    private int numberUpgrade = 0; // Número de elementos a colorear
+    private int level = 0; // Número de elementos a colorear
     private List<GameObject> allItems = new List<GameObject>(); // Lista para mantener todos los items
     private int maxLevel;
     private int costNumber;
@@ -29,13 +30,13 @@ public class UpgradeContainer : MonoBehaviour
         maxLevel = GameUtil.Instance.GetMaxLevel(menuNumber);
         numberOfItems = maxLevel;
         maxLevelText.text = maxLevel.ToString();
-        numberUpgrade = 1;
+        level = 1;
 
         for (int i = 0; i < numberOfItems; i++)
         {
             GameObject newItem = AddItem();
             allItems.Add(newItem); // Almacena referencia al nuevo item
-            if (i < numberUpgrade)
+            if (i < level)
             {
                 ColorItem(newItem);
             }
@@ -47,18 +48,20 @@ public class UpgradeContainer : MonoBehaviour
         switch (menuNumber)
         {
             case 0:
-                numberUpgrade = UserData.Instance.damageLevel;
-                costNumber = GameUtil.Instance.GetCoinCost(menuNumber, numberUpgrade);
+                level = UserData.Instance.damageLevel;
+                costNumber = GameUtil.Instance.GetCoinCost(menuNumber, level);
                 break;
             case 1:
-                numberUpgrade = UserData.Instance.healthLevel;
-                costNumber = GameUtil.Instance.GetCoinCost(menuNumber, numberUpgrade);
+                level = UserData.Instance.healthLevel;
+                costNumber = GameUtil.Instance.GetCoinCost(menuNumber, level);
                 break;
             case 2:
-                numberUpgrade = UserData.Instance.speedLevel;
-                costNumber = GameUtil.Instance.GetGemCost(numberUpgrade);
+                level = UserData.Instance.speedLevel;
+                costNumber = GameUtil.Instance.GetGemCost(level);
                 break;
         }
+
+        levelText.text = level.ToString();
 
         if (costNumber != -1)
         {
@@ -81,7 +84,7 @@ public class UpgradeContainer : MonoBehaviour
             Image image = item.GetComponent<Image>();
             if (image != null)
             {
-                image.color = i < numberUpgrade ? coloredItemColor : resetColor;
+                image.color = i < level ? coloredItemColor : resetColor;
             }
         }
     }

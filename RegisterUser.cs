@@ -16,33 +16,22 @@ public class RegisterUser : MonoBehaviour
     public GameObject feedbackUI;
     public TMP_Text feedbackText;
 
-    private FirebaseAuth auth;
-    private FirebaseFirestore db;
+    public GameObject registerMenu;
+
+    private UserData userData;
 
     void Start()
     {
         feedbackUI.SetActive(false);
-
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
-        {
-            if (task.Result == DependencyStatus.Available)
-            {
-                auth = FirebaseAuth.DefaultInstance;
-                db = FirebaseFirestore.DefaultInstance;
-            }
-            else
-            {
-                Debug.LogError("Could not resolve all Firebase dependencies: " + task.Exception);
-            }
-        });
+        userData = UserData.Instance;
     }
 
     public void Register()
     {
-        string username = usernameInputField.text.ToString();
-        string email = emailInputField.text.ToString();
-        string password = passwordInputField.text.ToString();
-        string confirmPassword = confirmPasswordInputField.text.ToString();
+        string username = usernameInputField.text;
+        string email = emailInputField.text;
+        string password = passwordInputField.text;
+        string confirmPassword = confirmPasswordInputField.text;
 
         if (password != confirmPassword)
         {
@@ -50,60 +39,42 @@ public class RegisterUser : MonoBehaviour
             return;
         }
 
-        if (auth == null)
+        if (userData.auth == null || userData.db == null)
         {
-            Debug.Log("Firebase Auth is not initialized.");
+            Debug.Log("Firebase is not initialized.");
             return;
         }
 
-        if (db == null)
+        userData.auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
         {
-            Debug.Log("Firebase Firestore is not initialized.");
-            return;
-        }
-
-        auth.CreateUserWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(task =>
-        {
-            if (task.IsCanceled)
-            {
-                StartCoroutine(UpdateFeedbackUI("Registration canceled."));
-                return;
-            }
-            if (task.IsFaulted)
+            if (task.IsCanceled || task.IsFaulted)
             {
                 StartCoroutine(UpdateFeedbackUI("Error: " + task.Exception?.Flatten().Message));
                 return;
             }
 
-            if (task.Result == null || task.Result.User == null)
-            {
-                StartCoroutine(UpdateFeedbackUI("Error: User creation result is null."));
-                return;
-            }
-
             FirebaseUser newUser = task.Result.User;
 
-            DocumentReference userDoc = db.Collection("users").Document(newUser.UserId);
-            Dictionary<string, object> userData = new()
+            DocumentReference userDoc = userData.db.Collection("users").Document(newUser.UserId);
+            Dictionary<string, object> data = new()
             {
                 { "username", username },
-                { "email", email },
-                { "password", password }
+                { "email", email }
             };
 
-            userDoc.SetAsync(userData).ContinueWithOnMainThread(storeTask =>
+            userDoc.SetAsync(data).ContinueWithOnMainThread(storeTask =>
             {
                 if (storeTask.IsFaulted)
                 {
                     StartCoroutine(UpdateFeedbackUI("Error storing user data"));
                     return;
                 }
-                UserSessionManager.Instance.user = newUser;
-                UserData.Instance.LoadUserData();
+                userData.user = newUser;
+                userData.LoadUserData();
                 StartCoroutine(UpdateFeedbackUI("User registered successfully!"));
+                registerMenu.SetActive(false);
             });
         });
-
     }
 
     private IEnumerator UpdateFeedbackUI(string message)

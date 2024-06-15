@@ -5,12 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class GameData : MonoBehaviour
 {
-    public int currentRound = 1;
-
+    public int currentRound;
     public float multiplier;
+    public float difficultyMultiplier;
+    public float roundMultiplier;
 
-    public float difficultyMultiplier = 1;
-    public float roundMultiplier = 0;
     public readonly float roundIncreaseMultiplier = 0.05f;
 
     public static GameData Instance;
@@ -31,6 +30,7 @@ public class GameData : MonoBehaviour
     // Set the difficulty multiplier and load the game scene
     public void SetDifficultyMultiplierAndLoadGame(float value)
     {
+        ResetValues();
         difficultyMultiplier = value;
         SceneManager.LoadScene("Game");
     }
@@ -58,5 +58,12 @@ public class GameData : MonoBehaviour
         {
             roundMultiplier += roundIncreaseMultiplier;
         }
+    }
+
+    private void ResetValues()
+    {
+        currentRound = 0;
+        multiplier = 0;
+        roundMultiplier = 0;
     }
 }

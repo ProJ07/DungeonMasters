@@ -12,46 +12,14 @@ public class UserSessionManager : MonoBehaviour
     public TMP_Text userNameText;
     public TMP_Text userEmailText;
 
-    private FirebaseAuth auth;
-    private FirebaseFirestore db;
-    public FirebaseUser user;
+    private UserData userData;
 
-    // Instancia
-    public static UserSessionManager Instance { get; private set; }
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
-
-    }
-
-        void Start()
+    void Start()
     {
         loginMenu.SetActive(false);
         userMenu.SetActive(false);
 
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
-        {
-            if (task.Result == DependencyStatus.Available)
-            {
-                auth = FirebaseAuth.DefaultInstance;
-                db = FirebaseFirestore.DefaultInstance;
-                user = auth.CurrentUser;
-                Debug.Log("Firebase initialized successfully.");
-            }
-            else
-            {
-                Debug.LogError("Could not resolve all Firebase dependencies: " + task.Exception);
-            }
-        });
+        userData = UserData.Instance;
     }
 
     private void ShowLoginMenu()
@@ -64,10 +32,10 @@ public class UserSessionManager : MonoBehaviour
     {
         loginMenu.SetActive(false);
         userMenu.SetActive(true);
-        userEmailText.text = user.Email;
+        userEmailText.text = userData.user.Email;
 
         // Obtener el nombre de usuario del documento de Firestore
-        DocumentReference userDoc = db.Collection("users").Document(user.UserId);
+        DocumentReference userDoc = userData.db.Collection("users").Document(userData.user.UserId);
         userDoc.GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
             if (task.IsCompleted && task.Result.Exists)
@@ -80,7 +48,7 @@ public class UserSessionManager : MonoBehaviour
 
     public void LoginButtonClicked()
     {
-        if (user == null)
+        if (userData.user == null)
         {
             ShowLoginMenu();
         }
@@ -92,26 +60,15 @@ public class UserSessionManager : MonoBehaviour
 
     public void SaveUserData()
     {
-        UserData.Instance.SaveUserData();
+        userData.SaveUserData();
     }
 
     public void Logout()
     {
-        auth.SignOut();
-        user = null;
-        SetValuesToDefault();
+        userData.auth.SignOut();
+        userData.user = null;
+        userData.SetValuesToDefault();
         Debug.Log("User logged out successfully.");
         ShowLoginMenu();
-    }
-
-    public void SetValuesToDefault()
-    {
-        UserData.Instance.coins = 20;
-        UserData.Instance.gems = 5;
-        UserData.Instance.damageLevel = 0;
-        UserData.Instance.healthLevel = 0;
-        UserData.Instance.speedLevel = 0;
-        UserData.Instance.mediumUnlocked = false;
-        UserData.Instance.hardUnlocked = false;
     }
 }

@@ -13,26 +13,14 @@ public class LoginUser : MonoBehaviour
     public GameObject feedbackUI;
     public TMP_Text feedbackText;
 
-    private FirebaseAuth auth;
-    private FirebaseFirestore db;
+    public GameObject loginMenu;
+
+    private UserData userData;
 
     void Start()
     {
         feedbackUI.SetActive(false);
-
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
-        {
-            if (task.Result == DependencyStatus.Available)
-            {
-                auth = FirebaseAuth.DefaultInstance;
-                db = FirebaseFirestore.DefaultInstance;
-                
-            }
-            else
-            {
-                Debug.LogError("Could not resolve all Firebase dependencies: " + task.Exception);
-            }
-        });
+        userData = UserData.Instance;
     }
 
     public void Login()
@@ -40,21 +28,16 @@ public class LoginUser : MonoBehaviour
         string username = usernameInputField.text;
         string password = passwordInputField.text;
 
-        if (auth == null || db == null)
+        if (userData.auth == null || userData.db == null)
         {
             StartCoroutine(UpdateFeedbackUI("Firebase is not initialized yet. Please try again later."));
             return;
         }
 
         // Look up the email based on the username in Firestore
-        db.Collection("users").WhereEqualTo("username", username).GetSnapshotAsync().ContinueWithOnMainThread(task =>
+        userData.db.Collection("users").WhereEqualTo("username", username).GetSnapshotAsync().ContinueWithOnMainThread(task =>
         {
-            if (task.IsCanceled)
-            {
-                StartCoroutine(UpdateFeedbackUI("Login canceled."));
-                return;
-            }
-            if (task.IsFaulted)
+            if (task.IsCanceled || task.IsFaulted)
             {
                 StartCoroutine(UpdateFeedbackUI("Error: " + task.Exception?.Flatten().Message));
                 return;
@@ -67,7 +50,6 @@ public class LoginUser : MonoBehaviour
                 return;
             }
 
-            // Ensure the snapshot has documents
             foreach (DocumentSnapshot document in snapshot.Documents)
             {
                 if (document.Exists)
@@ -75,22 +57,18 @@ public class LoginUser : MonoBehaviour
                     string email = document.GetValue<string>("email");
 
                     // Authenticate the user with Firebase Authentication
-                    auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(authTask =>
+                    userData.auth.SignInWithEmailAndPasswordAsync(email, password).ContinueWithOnMainThread(authTask =>
                     {
-                        if (authTask.IsCanceled)
-                        {
-                            StartCoroutine(UpdateFeedbackUI("Login canceled."));
-                            return;
-                        }
-                        if (authTask.IsFaulted)
+                        if (authTask.IsCanceled || authTask.IsFaulted)
                         {
                             StartCoroutine(UpdateFeedbackUI("Invalid Username or Password"));
                             return;
                         }
 
-                        UserSessionManager.Instance.user = authTask.Result.User;
-                        UserData.Instance.LoadUserData();
+                        userData.user = authTask.Result.User;
+                        userData.LoadUserData();
                         StartCoroutine(UpdateFeedbackUI("User logged in successfully!"));
+                        loginMenu.SetActive(false);
                     });
                     return;
                 }

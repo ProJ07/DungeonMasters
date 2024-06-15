@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -7,12 +6,11 @@ using Firebase.Auth;
 using Firebase.Extensions;
 using Firebase.Firestore;
 using System.Linq;
-using UnityEngine.SceneManagement;
 
 public class UserData : MonoBehaviour
 {
-    public int coins = 20;
-    public int gems = 5;
+    public int coins = 10;
+    public int gems = 0;
     public int damageLevel = 0;
     public int healthLevel = 0;
     public int speedLevel = 0;
@@ -21,15 +19,11 @@ public class UserData : MonoBehaviour
 
     private TMP_Text coinsText;
     private TMP_Text gemsText;
-    private TMP_Text damageLevelText;
-    private TMP_Text healthLevelText;
-    private TMP_Text speedLevelText;
 
-    private FirebaseAuth auth;
-    private FirebaseFirestore db;
-    private FirebaseUser user;
+    public FirebaseAuth auth;
+    public FirebaseFirestore db;
+    public FirebaseUser user;
 
-    public bool menuUpgradeActive = false;
     public bool inGame;
 
     // Instancia
@@ -59,6 +53,7 @@ public class UserData : MonoBehaviour
                 auth = FirebaseAuth.DefaultInstance;
                 db = FirebaseFirestore.DefaultInstance;
                 user = auth.CurrentUser;
+                Debug.Log("Firebase initialized successfully.");
 
                 if (user != null)
                 {
@@ -76,16 +71,16 @@ public class UserData : MonoBehaviour
         });
     }
 
-    public void Update()
+    private void Update()
     {
-        coinsText.text = coins.ToString();
-        gemsText.text = gems.ToString();
-
-        if (menuUpgradeActive)
+        if (coinsText != null)
         {
-            damageLevelText.text = damageLevel.ToString();
-            healthLevelText.text = healthLevel.ToString();
-            speedLevelText.text = speedLevel.ToString();
+            coinsText.text = coins.ToString();
+        }
+
+        if (gemsText != null)
+        {
+            gemsText.text = gems.ToString();
         }
     }
 
@@ -121,14 +116,12 @@ public class UserData : MonoBehaviour
 
     public void LoadUserData()
     {
-
         if (user != null)
         {
             DocumentReference docRef = db.Collection("users").Document(user.UserId).Collection("data").Document("userData");
 
             docRef.GetSnapshotAsync().ContinueWithOnMainThread(task =>
             {
-
                 if (task.IsFaulted)
                 {
                     Debug.LogError("Error loading user data: " + task.Exception);
@@ -138,7 +131,6 @@ public class UserData : MonoBehaviour
                 DocumentSnapshot snapshot = task.Result;
                 if (snapshot.Exists)
                 {
-
                     Dictionary<string, object> userData = snapshot.ToDictionary();
                     coins = (int)(long)userData["coins"];
                     gems = (int)(long)userData["gems"];
@@ -157,21 +149,20 @@ public class UserData : MonoBehaviour
         }
     }
 
-    public void SetUpgradeMenuVar(bool var)
-    {
-        menuUpgradeActive = var;
-    }
-
-    public void SetUpgradeMenuTexts()
-    {
-        damageLevelText = GameObject.Find("DamageLevelNumber").GetComponent<TextMeshProUGUI>();
-        healthLevelText = GameObject.Find("HealthLevelNumber").GetComponent<TextMeshProUGUI>();
-        speedLevelText = GameObject.Find("SpeedLevelNumber").GetComponent<TextMeshProUGUI>();
-    }
-
     public void SetTexts()
     {
-        coinsText = GameObject.Find("CoinNumber").GetComponent<TextMeshProUGUI>();
-        gemsText = GameObject.Find("GemNumber").GetComponent<TextMeshProUGUI>();
+        coinsText = GameObject.Find("CoinNumber")?.GetComponent<TextMeshProUGUI>();
+        gemsText = GameObject.Find("GemNumber")?.GetComponent<TextMeshProUGUI>();
+    }
+
+    public void SetValuesToDefault()
+    {
+        coins = 10;
+        gems = 0;
+        damageLevel = 0;
+        healthLevel = 0;
+        speedLevel = 0;
+        mediumUnlocked = false;
+        hardUnlocked = false;
     }
 }

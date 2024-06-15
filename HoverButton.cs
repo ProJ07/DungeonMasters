@@ -14,13 +14,13 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         if (gameObject.name.Equals("MediumButton") && !UserData.Instance.mediumUnlocked)
         {
-            hoverText.text = "Reach Round 10 in Easy Difficulty";
+            hoverText.text = "Reach Round 20 in Easy Difficulty";
             hoverUI.SetActive(true);
         }
 
         if (gameObject.name.Equals("HardButton") && !UserData.Instance.hardUnlocked)
         {
-            hoverText.text = "Reach Round 10 in Medium Difficulty";
+            hoverText.text = "Reach Round 20 in Medium Difficulty";
             hoverUI.SetActive(true);
         }
     }

@@ -16,7 +16,6 @@ public class SceneLoader : MonoBehaviour
     // Esta función se llama cada vez que se carga una nueva escena
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log("Escena cargada: " + scene.name);
 
         // Verificar el nombre de la escena
         switch (scene.name)
@@ -28,7 +27,6 @@ public class SceneLoader : MonoBehaviour
                 HandleGameScene();
                 break;
             default:
-                HandleDefaultScene();
                 break;
         }
     }
@@ -36,25 +34,18 @@ public class SceneLoader : MonoBehaviour
     // Define aquí las funciones que deseas ejecutar para cada escena
     private void HandleVillageScene()
     {
-        Debug.Log("Loading Village.");
+        Debug.Log("Loading Village...");
         PlayerStats.Instance.ResetPlayer();
         UserData.Instance.SetTexts();
         Destroy(GameObject.Find("GameStats"));
-        
         Destroy(GameObject.Find("RoundManager"));
         UserData.Instance.LoadUserData();
     }
 
     private void HandleGameScene()
     {
-        Debug.Log("Loading Game.");
+        Debug.Log("Loading Game...");
         // Lógica específica para la escena Game
         // Por ejemplo, iniciar el juego, configurar enemigos, etc.
-    }
-
-    private void HandleDefaultScene()
-    {
-        Debug.Log("Ejecutando lógica para la escena por defecto.");
-        // Lógica para cualquier otra escena
     }
 }
